@@ -127,12 +127,16 @@ default_args = {
 with DAG('parsing_govt_data',
         catchup=False, # To skip any intervals we didn't run
         default_args=default_args,
-        schedule_interval='* * * 1 * *', # 's m h d mo y'; set to run daily.
+        schedule_interval='* 1 * * * *', # 's m h d mo y'; set to run every minute.
         ) as dag:
 
     opr_json_to_csv = PythonOperator(
             task_id='json_to_csv',
-            python_callable=jsonToCsv
+            python_callable=jsonToCsv,
+            op_kwargs={
+                'url':'https://data.sfgov.org/resource/pv99-gzft.json',
+                'outputcsv':'./rogoben.csv'
+                }
             )
 
     opr_csv_to_sql = PythonOperator(
